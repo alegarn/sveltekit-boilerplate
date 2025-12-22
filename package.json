@@ -1,0 +1,35 @@
+{
+  "name": "create-sveltekit-boilerplate",
+  "version": "0.1.0",
+  "description": "A CLI tool to generate SvelteKit boilerplate with customizable features",
+  "type": "module",
+  "bin": {
+    "create-sveltekit-boilerplate": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "lint": "eslint src --ext .ts",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "keywords": [
+    "sveltekit",
+    "boilerplate",
+    "svelte5",
+    "cli",
+    "template",
+    "generator"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "prompts": "^2.4.2",
+    "picocolors": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@types/prompts": "^2.4.9",
+    "typescript": "^5.3.3"
+  }
+}
