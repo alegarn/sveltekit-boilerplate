@@ -132,9 +132,94 @@ npm run dev
 npm start
 ```
 
+## Examples
+
+Check out the [examples](./examples/) directory for common configuration patterns:
+
+- **[Full-Featured App](./examples/full-featured.md)** - Complete setup with all features enabled
+- **[Minimal App](./examples/minimal.md)** - Bare-bones SvelteKit starter
+- **[SaaS Starter](./examples/saas-starter.md)** - Perfect for building SaaS products
+- **[Content Site](./examples/content-site.md)** - Optimized for blogs and marketing sites
+
+## Project Structure
+
+Each generated project follows SvelteKit conventions:
+
+- `src/routes/` - Your application routes
+- `src/lib/` - Reusable components and utilities
+- `static/` - Static assets (images, fonts, etc.)
+- `tests/` - End-to-end tests (if Playwright is enabled)
+
+## Features in Detail
+
+### Development Tools
+
+- **ESLint**: Configured with Svelte-specific rules and TypeScript support
+- **TypeScript**: Full type safety with proper SvelteKit types
+- **Vitest**: Fast unit testing with Svelte component support
+- **Playwright**: Reliable E2E testing with real browser automation
+
+### UI Frameworks
+
+- **svelte-shadcn UI**: Accessible components built with Tailwind CSS, ready to customize
+- **Storybook**: Isolated component development with hot reload and docs
+
+### Databases
+
+- **PostgreSQL**: Direct connection with pg library, ready for migrations
+- **Supabase**: Backend-as-a-service with auth, database, and real-time subscriptions
+
+### Type-Safe Backend
+
+- **tRPC-SvelteKit**: End-to-end type safety between client and server
+- **Zod**: Runtime validation with TypeScript inference
+
+### Payment Integration
+
+- **Stripe**: Complete payment setup with subscription support
+- **Paddle**: Merchant of record payment processing
+
+### SEO Features
+
+- **Dynamic OG Images**: Generate social media preview images on-demand
+- **Sitemap.xml**: Automatic sitemap generation for search engines
+- **Robots.txt**: Search engine crawler instructions
+
+### Authentication
+
+- **Auth.js**: Multiple OAuth providers (GitHub, Google, etc.)
+- **Lucia**: Lightweight auth with session management
+
+## Troubleshooting
+
+### Build Errors
+
+If you encounter build errors after generating a project:
+
+1. Make sure you've installed dependencies: `npm install`
+2. Check that all environment variables are set
+3. Try clearing the SvelteKit cache: `rm -rf .svelte-kit`
+
+### Type Errors
+
+If TypeScript shows errors:
+
+1. Run `npm run check` to sync types
+2. Make sure you're using compatible versions
+3. Check that `tsconfig.json` extends `.svelte-kit/tsconfig.json`
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+### Development Setup
+
+1. Fork the repository
+2. Clone your fork
+3. Install dependencies: `npm install`
+4. Make your changes
+5. Build and test: `npm run build && npm start`
+6. Submit a pull request
 
 ## License
 
