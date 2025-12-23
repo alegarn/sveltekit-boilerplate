@@ -128,6 +128,14 @@ if (config.newFeature === 'optionA') {
 }
 ```
 
+**Important:** Before adding new dependencies, check the latest versions:
+
+```bash
+npm run check-versions
+```
+
+This script will fetch the latest versions of all packages. Always verify compatibility between packages after updating versions.
+
 ### 4. Add Configuration Files
 
 Create templates in `src/templates/` if needed:

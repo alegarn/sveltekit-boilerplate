@@ -11,7 +11,8 @@
     "dev": "tsc --watch",
     "start": "node dist/index.js",
     "lint": "eslint src --ext .ts",
-    "test": "echo \"No tests yet\" && exit 0"
+    "test": "echo \"No tests yet\" && exit 0",
+    "check-versions": "node scripts/check-package-versions.js"
   },
   "keywords": [
     "sveltekit",
