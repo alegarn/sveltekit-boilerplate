@@ -41,7 +41,7 @@ export const handle: Handle = async (input) => {
 	const featureHandles: Handle[] = [];
 	for (const m of manifests) {
 		try {
-			const hooks = (await m?.hooks?.()) ?? {};
+			const hooks = m?.hooks ? await m.hooks() : {};
 			if (hooks.handle) featureHandles.push(hooks.handle);
 		} catch (e) {
 			console.warn(`[features] Error loading hooks for '${m?.id ?? 'unknown'}':`, e);
