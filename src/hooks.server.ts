@@ -1,5 +1,5 @@
-import type { Handle } from '@sveltejs/kit';
-import featuresConfig from './features/features.config.js';
+import type { Handle } from "@sveltejs/kit";
+import featuresConfig from "./features/features.config.js";
 
 // Compose feature-provided hooks in a predictable order.
 // Each feature may export a manifest at src/features/<feature>/manifest.ts
@@ -28,19 +28,20 @@ async function loadFeatureManifests(enabled: string[]) {
 }
 
 function sequence(...handles: Handle[]): Handle {
-	return async ({ event, resolve }) => {
-		let i = -1;
-		const runner: Handle = async ({ event, resolve }) => {
-			i++;
-			const handle = handles[i];
-			if (!handle) return resolve(event);
-			return handle({
-				event,
-				resolve: (e, opts) => runner({ event: e, resolve: (ev) => resolve(ev, opts) })
-			});
-		};
-		return runner({ event, resolve });
-	};
+  return async ({ event, resolve }) => {
+    const runner = (i: number): Handle => {
+      return async ({ event, resolve }) => {
+        const handle = handles[i];
+        if (!handle) return resolve(event);
+        return handle({
+          event,
+          resolve: (e, opts) =>
+            runner(i + 1)({ event: e, resolve: (ev) => resolve(ev, opts) }),
+        });
+      };
+    };
+    return runner(0)({ event, resolve });
+  };
 }
 
 let cachedHandlePromise: Promise<Handle> | null = null;
