@@ -5,9 +5,18 @@ import featuresConfig from './features/features.config.js';
 // Each feature may export a manifest at src/features/<feature>/manifest.ts
 // with an optional hooks() that returns { handle }.
 
+function isSafeFeatureId(id: string): boolean {
+	// Allow only alphanumeric characters, hyphens, and underscores to avoid path traversal.
+	return /^[A-Za-z0-9_-]+$/.test(id);
+}
+
 async function loadFeatureManifests(enabled: string[]) {
 	const manifests = [] as Array<{ id: string; hooks?: () => any }>;
 	for (const id of enabled) {
+		if (!isSafeFeatureId(id)) {
+			console.warn(`[features] Skipping manifest load for invalid feature id '${id}'.`);
+			continue;
+		}
 		try {
 			const mod = await import(`./features/${id}/manifest`);
 			manifests.push(mod.default ?? mod.manifest ?? mod);
