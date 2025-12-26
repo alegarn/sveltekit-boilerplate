@@ -43,20 +43,36 @@ function sequence(...handles: Handle[]): Handle {
 	};
 }
 
-export const handle: Handle = async (input) => {
-	const enabled = Array.isArray(featuresConfig?.enabled) ? featuresConfig.enabled : [];
-	const manifests = await loadFeatureManifests(enabled);
+let cachedHandlePromise: Promise<Handle> | null = null;
 
-	const featureHandles: Handle[] = [];
-	for (const m of manifests) {
-		try {
-			const hooks = m?.hooks ? await m.hooks() : {};
-			if (hooks.handle) featureHandles.push(hooks.handle);
-		} catch (e) {
-			console.warn(`[features] Error loading hooks for '${m?.id ?? 'unknown'}':`, e);
-		}
+async function getOrCreateHandle(): Promise<Handle> {
+	if (!cachedHandlePromise) {
+		cachedHandlePromise = (async () => {
+			const enabled = Array.isArray(featuresConfig?.enabled) ? featuresConfig.enabled : [];
+			const manifests = await loadFeatureManifests(enabled);
+
+			const featureHandles: Handle[] = [];
+			for (const m of manifests) {
+				try {
+					const hooks = (await m?.hooks?.()) ?? {};
+					if (hooks.handle) featureHandles.push(hooks.handle);
+				} catch (e) {
+					console.warn(`[features] Error loading hooks for '${m?.id ?? 'unknown'}':`, e);
+				}
+			}
+
+			if (featureHandles.length === 0) {
+				return (async ({ event, resolve }) => resolve(event)) as Handle;
+			}
+
+			return sequence(...featureHandles);
+		})();
 	}
 
-	if (featureHandles.length === 0) return input.resolve(input.event);
-	return sequence(...featureHandles)(input);
+	return cachedHandlePromise;
+}
+
+export const handle: Handle = async (input) => {
+	const composedHandle = await getOrCreateHandle();
+	return composedHandle(input);
 };
