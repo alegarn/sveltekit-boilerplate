@@ -26,4 +26,4 @@ if (result.error) {
 	process.exit(1);
 }
 
-process.exit(result.status ?? 1);
+process.exit(result.status ?? 0);

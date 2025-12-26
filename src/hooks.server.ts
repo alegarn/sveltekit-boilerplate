@@ -5,17 +5,26 @@ import featuresConfig from "./features/features.config.js";
 // Each feature may export a manifest at src/features/<feature>/manifest.ts
 // with an optional hooks() that returns { handle }.
 
+function isSafeFeatureId(id: string): boolean {
+	// Allow only alphanumeric characters, hyphens, and underscores to avoid path traversal.
+	return /^[A-Za-z0-9_-]+$/.test(id);
+}
+
 async function loadFeatureManifests(enabled: string[]) {
-  const manifests = [] as Array<{ id: string; hooks?: () => any }>;
-  for (const id of enabled) {
-    try {
-      const mod = await import(`./features/${id}/manifest`);
-      manifests.push(mod.default ?? mod.manifest ?? mod);
-    } catch (e) {
-      console.warn(`[features] Could not load manifest for '${id}':`, e);
-    }
-  }
-  return manifests;
+	const manifests = [] as Array<{ id: string; hooks?: () => any }>;
+	for (const id of enabled) {
+		if (!isSafeFeatureId(id)) {
+			console.warn(`[features] Skipping manifest load for invalid feature id '${id}'.`);
+			continue;
+		}
+		try {
+			const mod = await import(`./features/${id}/manifest`);
+			manifests.push(mod.default ?? mod.manifest ?? mod);
+		} catch (e) {
+			console.warn(`[features] Could not load manifest for '${id}':`, e);
+		}
+	}
+	return manifests;
 }
 
 function sequence(...handles: Handle[]): Handle {
@@ -35,25 +44,36 @@ function sequence(...handles: Handle[]): Handle {
   };
 }
 
+let cachedHandlePromise: Promise<Handle> | null = null;
+
+async function getOrCreateHandle(): Promise<Handle> {
+	if (!cachedHandlePromise) {
+		cachedHandlePromise = (async () => {
+			const enabled = Array.isArray(featuresConfig?.enabled) ? featuresConfig.enabled : [];
+			const manifests = await loadFeatureManifests(enabled);
+
+			const featureHandles: Handle[] = [];
+			for (const m of manifests) {
+				try {
+					const hooks = (await m?.hooks?.()) ?? {};
+					if (hooks.handle) featureHandles.push(hooks.handle);
+				} catch (e) {
+					console.warn(`[features] Error loading hooks for '${m?.id ?? 'unknown'}':`, e);
+				}
+			}
+
+			if (featureHandles.length === 0) {
+				return (async ({ event, resolve }) => resolve(event)) as Handle;
+			}
+
+			return sequence(...featureHandles);
+		})();
+	}
+
+	return cachedHandlePromise;
+}
+
 export const handle: Handle = async (input) => {
-  const enabled = Array.isArray(featuresConfig?.enabled)
-    ? featuresConfig.enabled
-    : [];
-  const manifests = await loadFeatureManifests(enabled);
-
-  const featureHandles: Handle[] = [];
-  for (const m of manifests) {
-    try {
-      const hooks = m?.hooks ? await m.hooks() : {};
-      if (hooks.handle) featureHandles.push(hooks.handle);
-    } catch (e) {
-      console.warn(
-        `[features] Error loading hooks for '${m?.id ?? "unknown"}':`,
-        e,
-      );
-    }
-  }
-
-  if (featureHandles.length === 0) return input.resolve(input.event);
-  return sequence(...featureHandles)(input);
+	const composedHandle = await getOrCreateHandle();
+	return composedHandle(input);
 };
