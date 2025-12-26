@@ -101,7 +101,7 @@ const manifest: FeatureManifest = {
 2. Run:
 
 ```bash
-node scripts/generate-features.js --clean
+npm run generate-features -- --clean
 ```
 
 (or manually delete the corresponding folder under `src/routes/(features)`)
