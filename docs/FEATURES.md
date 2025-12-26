@@ -26,7 +26,7 @@ export default {
 Then generate routes:
 
 ```bash
-node scripts/generate-features.js
+npm run generate-features
 ```
 
 ## Route generation
@@ -49,8 +49,8 @@ It is **idempotent**: by default it will **not overwrite existing destination fi
 Examples:
 
 ```bash
-node scripts/generate-features.js --clean
-node scripts/generate-features.js --clean --force
+npm run generate-features -- --clean
+npm run generate-features -- --clean --force
 ```
 
 ### Skipping generation
@@ -59,7 +59,7 @@ Set the environment variable below to skip generation (useful in CI or when you
 manage routes differently):
 
 ```bash
-SKIP_FEATURES_GENERATE=1 node scripts/generate-features.js
+SKIP_FEATURES_GENERATE=1 npm run generate-features
 ```
 
 ## Adding a feature
@@ -101,7 +101,7 @@ const manifest: FeatureManifest = {
 2. Run:
 
 ```bash
-node scripts/generate-features.js --clean
+npm run generate-features -- --clean
 ```
 
 (or manually delete the corresponding folder under `src/routes/(features)`)
